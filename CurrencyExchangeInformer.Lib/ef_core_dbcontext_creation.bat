@@ -1,0 +1,1 @@
+﻿dotnet ef dbcontext scaffold Name=ExchangeCurrencyDb:ConnectionString Microsoft.EntityFrameworkCore.SqlServer --output-dir Models --context ExchangeCurrencyDbContext --force -d

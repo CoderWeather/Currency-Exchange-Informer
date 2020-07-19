@@ -3,6 +3,19 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <Nullable>enable</Nullable>
+        <AssemblyName>CurrencyExchangeInformer.ConsoleApp</AssemblyName>
+        <RootNamespace>CurrencyExchangeInformer.ConsoleApp</RootNamespace>
     </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CurrencyExchangeInformer.Lib\CurrencyExchangeInformer.Lib.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 
 </Project>

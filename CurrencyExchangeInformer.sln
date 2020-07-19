@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyExchangeInformer.Li
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{BF9C38CE-C593-4520-AF19-FB22D1AD9C2C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibTests", "LibTests\LibTests.csproj", "{EC8C0ED5-E7CA-4179-A007-B9A604AE3433}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{BF9C38CE-C593-4520-AF19-FB22D1AD9C2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF9C38CE-C593-4520-AF19-FB22D1AD9C2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF9C38CE-C593-4520-AF19-FB22D1AD9C2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC8C0ED5-E7CA-4179-A007-B9A604AE3433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC8C0ED5-E7CA-4179-A007-B9A604AE3433}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC8C0ED5-E7CA-4179-A007-B9A604AE3433}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC8C0ED5-E7CA-4179-A007-B9A604AE3433}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

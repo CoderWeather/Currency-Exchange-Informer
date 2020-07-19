@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Threading.Tasks;
+using CurrencyExchangeInformer.Lib.DataLoaders;
 
-namespace ConsoleApp
+namespace CurrencyExchangeInformer.ConsoleApp
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            using var dataAccessor = new CurrenciesDataAccessor(new CentroBankExchangeRatesLoader());
+
+            await dataAccessor.UpdateDbDataFromSource();
+            
+            Console.ReadLine();
         }
     }
 }
