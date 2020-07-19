@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CurrencyExchangeInformer.Lib.DbModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyExchangeInformer.Lib.DataLoaders
 {
@@ -24,8 +25,7 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			var currenciesConversions = await Loader.GetCurrencyConversionsAsync();
 
 			await UpdateCurrencies(currencies);
-			await DbContext.CurrencyConversions.AddRangeAsync(currenciesConversions);
-			await DbContext.SaveChangesAsync();
+			await UpdateCurrencyConversions(currenciesConversions);
 		}
 
 		private async Task UpdateCurrencies(IEnumerable<Currencies> currencies)
@@ -66,13 +66,10 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			await DbContext.SaveChangesAsync();
 		}
 
-		public decimal GetExchangeRateForDate(string isoCharCode, DateTime date) =>
-			DbContext.CurrencyConversions.First(cc =>
-				cc.Date.Date.Equals(date.Date) && cc.Item.IsoCharCode.Equals(isoCharCode)).Value;
-
-		public decimal GetExchangeRateForDate(int isoNumCode, DateTime date) =>
-			DbContext.CurrencyConversions.First(cc =>
-				cc.Date.Date.Equals(date.Date) && cc.Item.IsoNumCode.Equals(isoNumCode)).Value;
+		public async Task<decimal?> GetExchangeRateByNameForDate(string valuteName, DateTime date) =>
+			(await DbContext.CurrencyConversions.FirstOrDefaultAsync(cc =>
+				cc.Date.Date.Equals(date.Date) &&
+				(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))))?.Value;
 
 		public void Dispose()
 		{

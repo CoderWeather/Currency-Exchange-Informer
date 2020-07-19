@@ -24,7 +24,9 @@ namespace CurrencyExchangeInformer.Lib.DbModels
 		{
 			if (!optionsBuilder.IsConfigured)
 			{
-				optionsBuilder.UseSqlServer(
+				optionsBuilder
+				   .UseLazyLoadingProxies()
+				   .UseSqlServer(
 					CurrencyExchangeConfiguration.Instance
 					   .ServiceProvider.GetService<IAppSecrets>().ConnectionString);
 			}

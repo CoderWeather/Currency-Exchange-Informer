@@ -8,12 +8,12 @@ namespace CurrencyExchangeInformer.Lib.DbModels
 	{
 		[Required]
 		[Column("original_name")]
-		[StringLength(32)]
+		[StringLength(64)]
 		public string OriginalName { get; set; }
 
 		[Required]
 		[Column("engName")]
-		[StringLength(32)]
+		[StringLength(64)]
 		public string EngName { get; set; }
 
 		[Column("nominal")] public int Nominal { get; set; }
