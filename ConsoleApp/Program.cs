@@ -12,6 +12,7 @@ namespace CurrencyExchangeInformer.ConsoleApp
 
             await dataAccessor.UpdateDbDataFromSource();
             
+            Console.WriteLine("Done");
             Console.ReadLine();
         }
     }

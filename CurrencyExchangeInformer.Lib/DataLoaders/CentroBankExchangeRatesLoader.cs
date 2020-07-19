@@ -17,7 +17,7 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			ExchangesRateForDate = @"http://www.cbr.ru/scripts/XML_daily.asp?date_req=";
 		}
 
-		private string GetRateUrlForDate(DateTime date) => ExchangesRateForDate + date.ToString("MM.dd.yyyy");
+		private string GetRateUrlForDate(DateTime date) => ExchangesRateForDate + date.ToString("dd.MM.yyyy");
 
 		public async Task<IEnumerable<Currencies>> GetCurrenciesAsync()
 		{
