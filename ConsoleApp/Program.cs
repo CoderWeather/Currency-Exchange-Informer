@@ -11,6 +11,8 @@ namespace CurrencyExchangeInformer.ConsoleApp
             using var dataAccessor = new CurrenciesDataAccessor(new CentroBankExchangeRatesLoader());
 
             await dataAccessor.UpdateDbDataFromSource();
+
+            await dataAccessor.GetExchangeRateByNameForDate("рубль");
             
             Console.WriteLine("Done");
             Console.ReadLine();
