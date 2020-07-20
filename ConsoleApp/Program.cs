@@ -12,7 +12,7 @@ namespace CurrencyExchangeInformer.ConsoleApp
 
             await dataAccessor.UpdateDbDataFromSource();
 
-            await dataAccessor.GetExchangeRateByNameForDate("рубль");
+            await dataAccessor.GetExchangeRateByNameForDate("рубль", DateTime.Now);
             
             Console.WriteLine("Done");
             Console.ReadLine();

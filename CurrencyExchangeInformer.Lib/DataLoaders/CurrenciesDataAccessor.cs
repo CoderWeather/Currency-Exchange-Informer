@@ -48,8 +48,8 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			await DbContext.SaveChangesAsync();
 		}
 
-		private async Task UpdateCurrencyConversions(IEnumerable<CurrencyConversions> currencyConversions) => 
-			UpdateCurrencyConversions(currencyConversions, DateTime.Now.Date);
+		private async Task UpdateCurrencyConversions(IEnumerable<CurrencyConversions> currencyConversions) =>
+			await UpdateCurrencyConversions(currencyConversions, DateTime.Now.Date);
 
 		private async Task UpdateCurrencyConversions(IEnumerable<CurrencyConversions> currencyConversions, DateTime date)
 		{
@@ -72,17 +72,19 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 		}
 
 		public async Task<decimal?> GetExchangeRateByNameForDate(string valuteName, DateTime date)
+		{
+			if (await DbContext.CurrencyConversions.AnyAsync(
+				cc => cc.Date.Equals(date.Date) &&
+				(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))
+				) is false)
 			{
-				if(await DbContext.CurrencyConversions.Any(cc => cc.Date.Date.Equals(date.Date)
-					(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))) is false)
-				{
-					var currenciesConversions = await Loader.GetCurrencyConversionsAsync(date.Date);
-				}
-
-				return (await DbContext.CurrencyConversions.FirstOrDefaultAsync(cc =>
-				cc.Date.Date.Equals(date.Date) &&
-				(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))))?.Value;
+				var currenciesConversions = await Loader.GetCurrencyConversionsForDateAsync(date.Date);
 			}
+
+			return (await DbContext.CurrencyConversions.FirstOrDefaultAsync(cc =>
+			cc.Date.Date.Equals(date.Date) &&
+			(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))))?.Value;
+		}
 
 		public void Dispose()
 		{
