@@ -23,19 +23,14 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 		{
 			var httpClient = new HttpXmlLoader(CurrenciesListUrl);
 			var parser = new CurrenciesXmlParser(await httpClient.LoadXmlDocumentAsync());
-			IEnumerable<Currencies> currencies = CurrenciesDbModelsFabric.CreateCurrencies(parser.GetCurrencies());
-
-			return currencies;
+			return CurrenciesDbModelsFabric.CreateCurrencies(parser.GetCurrencies());
 		}
 
-		public async Task<IEnumerable<CurrencyConversions>> GetCurrencyConversionsForDateAsync(DateTime date)
+		public async Task<IEnumerable<CurrencyRates>> GetCurrencyRatesForDateAsync(DateTime date)
 		{
 			var httpClient = new HttpXmlLoader(GetRateUrlForDate(date));
-			var parser = new CurrencyConversionsXmlParser(await httpClient.LoadStringAsync());
-			IEnumerable<CurrencyConversions> currencyConversions =
-				CurrenciesDbModelsFabric.CreateCurrenciesConversions(parser.GetCurrenciesConversions(), date);
-
-			return currencyConversions;
+			var parser = new CurrencyRatesXmlParser(await httpClient.LoadStringAsync());
+			return CurrenciesDbModelsFabric.CreateCurrenciesRates(parser.GetCurrenciesRates(), date);
 		}
 	}
 }

@@ -4,21 +4,21 @@ using System.Xml.Linq;
 
 namespace CurrencyExchangeInformer.Lib.Xml
 {
-    public class CurrencyConversionsXmlParser
+    public class CurrencyRatesXmlParser
     {
         private readonly XDocument _document;
 
-        public CurrencyConversionsXmlParser(string data)
+        public CurrencyRatesXmlParser(string data)
         {
             _document = XDocument.Parse(data);
         }
 
-        public CurrencyConversionsXmlParser(XDocument document)
+        public CurrencyRatesXmlParser(XDocument document)
         {
             _document = document;
         }
 
-        public IEnumerable<XElement> GetCurrenciesConversions()
+        public IEnumerable<XElement> GetCurrenciesRates()
         {
             var rootEl = _document.Element("ValCurs");
             return rootEl is null

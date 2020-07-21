@@ -1,21 +1,35 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CurrencyExchangeInformer.Lib.DataLoaders;
+using CurrencyExchangeInformer.Lib.DbModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyExchangeInformer.ConsoleApp
 {
-    internal static class Program
-    {
-        private static async Task Main(string[] args)
-        {
-            using var dataAccessor = new CurrenciesDataAccessor(new CentroBankExchangeRatesLoader());
+	internal static class Program
+	{
+		private static async Task Main(string[] args)
+		{
+			// await using var dataAccessor = new CurrenciesDataAccessor(new CentroBankExchangeRatesLoader());
+			// Console.WriteLine("02.01.2020");
+			// foreach (var cc in 
+			// 	await dataAccessor.GetExchangeRatesForDate(new DateTime(2020, 1, 2).Date))
+			// {
+			// 	Console.WriteLine($"{cc.Item.OriginalName}: {cc.Value}");
+			// }
+			// await dataAccessor.UpdateDbDataFromSource();
+			// var rate = await dataAccessor.GetExchangeRateByNameForDate("рубль", DateTime.Today);
+			// Console.WriteLine(rate);
 
-            await dataAccessor.UpdateDbDataFromSource();
+			for (var iter = DateTime.Today; iter.DayOfYear > 1; iter = iter.AddDays(-1d))
+			{
+			    await using var dataAccessor = new CurrenciesDataAccessor(new CentroBankExchangeRatesLoader());
+			    await dataAccessor.UpdateCurrencyRates(iter);
+			    Console.WriteLine($"{iter:dd.MM.yyyy} parsed");
+			}
 
-            await dataAccessor.GetExchangeRateByNameForDate("рубль", DateTime.Now);
-            
-            Console.WriteLine("Done");
-            Console.ReadLine();
-        }
-    }
+			Console.WriteLine("Done");
+		}
+	}
 }

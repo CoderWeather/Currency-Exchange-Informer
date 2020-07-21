@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyExchangeInformer.Lib.DataLoaders
 {
-	public class CurrenciesDataAccessor : IDisposable
+	public class CurrenciesDataAccessor : IDisposable, IAsyncDisposable
 	{
 		private ExchangeCurrencyDbContext DbContext { get; }
 
@@ -19,76 +20,93 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			Loader = loader;
 		}
 
-		public async Task UpdateDbDataFromSource() => await UpdateDbDataFromSource(DateTime.Now.Date);
+		public async Task UpdateDbDataFromSource() => await UpdateDbDataFromSource(DateTime.Today.Date);
 
 		public async Task UpdateDbDataFromSource(DateTime date)
 		{
-			var currencies = await Loader.GetCurrenciesAsync();
-			var currenciesConversions = await Loader.GetCurrencyConversionsAsync();
-
-			await UpdateCurrencies(currencies);
-			await UpdateCurrencyConversions(currenciesConversions);
+			await UpdateCurrencies();
+			await UpdateCurrencyRates(date);
 		}
 
-		private async Task UpdateCurrencies(IEnumerable<Currencies> currencies)
+		public async Task UpdateCurrencies() => await UpdateCurrencies(await Loader.GetCurrenciesAsync());
+
+		public async Task UpdateCurrencies(IEnumerable<Currencies> currencies)
 		{
-			foreach (var cur in currencies)
+			foreach (var currency in currencies)
 			{
-				var curForAdd = DbContext.Currencies
-				   .FirstOrDefault(c =>
-						c.ItemId.Equals(cur.ItemId) &&
-						c.IsoNumCode.Equals(cur.IsoNumCode) &&
-						c.IsoCharCode.Equals(cur.IsoCharCode));
-				if (curForAdd is null)
+				var currencyForAdd = DbContext.Currencies
+				   .FirstOrDefault(c => c.ItemId.Equals(currency.ItemId));
+				if (currencyForAdd is null)
 				{
-					await DbContext.AddAsync(cur);
-				}
-			}
-
-			await DbContext.SaveChangesAsync();
-		}
-
-		private async Task UpdateCurrencyConversions(IEnumerable<CurrencyConversions> currencyConversions) =>
-			await UpdateCurrencyConversions(currencyConversions, DateTime.Now.Date);
-
-		private async Task UpdateCurrencyConversions(IEnumerable<CurrencyConversions> currencyConversions, DateTime date)
-		{
-			foreach (var curConv in currencyConversions)
-			{
-				var curConvForAdd = DbContext.CurrencyConversions
-				   .FirstOrDefault(cc =>
-						cc.ItemId.Equals(curConv.ItemId));
-				if (curConvForAdd is null)
-				{
-					await DbContext.AddAsync(curConv);
+					await DbContext.AddAsync(currency);
 				}
 				else
 				{
-					curConvForAdd.Value = curConv.Value;
+					currencyForAdd.Nominal = currency.Nominal;
+					currencyForAdd.OriginalName ??= currency.OriginalName;
+					currencyForAdd.EngName ??= currency.EngName;
+					currencyForAdd.ParentCode ??= currency.ParentCode;
+					currencyForAdd.IsoCharCode ??= currency.IsoCharCode;
+					currencyForAdd.IsoNumCode ??= currency.IsoNumCode;
 				}
 			}
 
 			await DbContext.SaveChangesAsync();
+		}
+
+		public async Task UpdateCurrencyRates() =>
+			await UpdateCurrencyRates(DateTime.Today);
+
+		public async Task UpdateCurrencyRates(DateTime date) =>
+			await UpdateCurrencyRates(await Loader.GetCurrencyRatesForDateAsync(date), date);
+
+		public async Task UpdateCurrencyRates(IEnumerable<CurrencyRates> currencyRates,
+			DateTime date)
+		{
+			date = date.Date;
+			foreach (var currencyRate in currencyRates)
+			{
+				var findCurrencyRate = DbContext.CurrencyRates
+				   .FirstOrDefault(cc =>
+						cc.ItemId.Equals(currencyRate.ItemId) && cc.Date.Equals(date));
+				if (findCurrencyRate is null)
+					await DbContext.AddAsync(currencyRate);
+				else
+				{
+					findCurrencyRate.Value = currencyRate.Value;
+				}
+				await DbContext.SaveChangesAsync();
+			}
+
+			await DbContext.SaveChangesAsync();
+		}
+
+		public async Task<List<CurrencyRates>> GetExchangeRatesForDate(DateTime date)
+		{
+			date = date.Date;
+			return await DbContext.CurrencyRates
+			   .Where(cc => cc.Date.Equals(date)).ToListAsync();
 		}
 
 		public async Task<decimal?> GetExchangeRateByNameForDate(string valuteName, DateTime date)
 		{
-			if (await DbContext.CurrencyConversions.AnyAsync(
-				cc => cc.Date.Equals(date.Date) &&
-				(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))
-				) is false)
+			date = date.Date;
+			if (await DbContext.CurrencyRates
+			   .AnyAsync(cc =>
+					cc.Date.Equals(date) &&
+					(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))) is false)
 			{
-				var currenciesConversions = await Loader.GetCurrencyConversionsForDateAsync(date.Date);
+				await UpdateCurrencyRates(date);
 			}
 
-			return (await DbContext.CurrencyConversions.FirstOrDefaultAsync(cc =>
-			cc.Date.Date.Equals(date.Date) &&
-			(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))))?.Value;
+			return (await DbContext.CurrencyRates
+			   .FirstOrDefaultAsync(cc =>
+					cc.Date.Equals(date) &&
+					(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName)))).Value;
 		}
 
-		public void Dispose()
-		{
-			DbContext.Dispose();
-		}
+		public void Dispose() => DbContext.Dispose();
+
+		public ValueTask DisposeAsync() => DbContext.DisposeAsync();
 	}
 }

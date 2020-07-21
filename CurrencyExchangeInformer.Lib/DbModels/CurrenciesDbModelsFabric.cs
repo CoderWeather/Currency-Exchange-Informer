@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace CurrencyExchangeInformer.Lib.DbModels
 {
-	public class CurrenciesDbModelsFabric
+	public static class CurrenciesDbModelsFabric
 	{
 		public static Currencies CreateCurrency(XElement el)
 		{
@@ -48,9 +48,9 @@ namespace CurrencyExchangeInformer.Lib.DbModels
 		public static IEnumerable<Currencies> CreateCurrencies(IEnumerable<XElement> elements) =>
 			elements.Select(CreateCurrency);
 
-		public static CurrencyConversions CreateCurrenciesConversion(XElement el, DateTime date)
+		public static CurrencyRates CreateCurrenciesConversion(XElement el, DateTime date)
 		{
-			var obj = new CurrencyConversions {Date = date.Date};
+			var obj = new CurrencyRates {Date = date};
 
 			var itemId = el.Attribute("ID")?.Value;
 			var nominal = el.Element("Nominal")?.Value;
@@ -68,7 +68,7 @@ namespace CurrencyExchangeInformer.Lib.DbModels
 			return obj;
 		}
 
-		public static IEnumerable<CurrencyConversions> CreateCurrenciesConversions(IEnumerable<XElement> elements,
+		public static IEnumerable<CurrencyRates> CreateCurrenciesRates(IEnumerable<XElement> elements,
 			DateTime date) =>
 			elements.Select(el => CreateCurrenciesConversion(el, date));
 	}
