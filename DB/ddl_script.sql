@@ -21,7 +21,7 @@ create table CurrencyRates
 		constraint CurrencyRates_Currencies_item_id_fk
 			references Currencies,
 	nominal int not null,
-	value decimal(18) not null,
+	value decimal(10,4) not null,
 	date date not null,
 	constraint CurrencyRates_pk
 		primary key nonclustered (item_id, date)
