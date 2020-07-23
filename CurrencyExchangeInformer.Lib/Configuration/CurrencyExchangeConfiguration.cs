@@ -7,19 +7,6 @@ namespace CurrencyExchangeInformer.Lib.Configuration
 {
 	public class CurrencyExchangeConfiguration : IAppConfiguration
 	{
-		#region Singletone
-
-		private static IAppConfiguration? _instance;
-		public static IAppConfiguration Instance => _instance ??= new CurrencyExchangeConfiguration();
-
-		#endregion
-
-		#region Public Properties
-
-		public IServiceProvider ServiceProvider { get; }
-
-		#endregion
-
 		public CurrencyExchangeConfiguration()
 		{
 			var devEnvVariable = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
@@ -41,5 +28,18 @@ namespace CurrencyExchangeInformer.Lib.Configuration
 
 			ServiceProvider = services.BuildServiceProvider();
 		}
+
+		#region Public Properties
+
+		public IServiceProvider ServiceProvider { get; }
+
+		#endregion
+
+		#region Singletone
+
+		private static IAppConfiguration? _instance;
+		public static IAppConfiguration Instance => _instance ??= new CurrencyExchangeConfiguration();
+
+		#endregion
 	}
 }

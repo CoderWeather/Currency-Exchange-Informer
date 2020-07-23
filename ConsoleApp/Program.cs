@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using CurrencyExchangeInformer.Lib.DataLoaders;
-using CurrencyExchangeInformer.Lib.DbModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyExchangeInformer.ConsoleApp
 {
@@ -24,9 +21,9 @@ namespace CurrencyExchangeInformer.ConsoleApp
 
 			for (var iter = DateTime.Today; iter.DayOfYear > 1; iter = iter.AddDays(-1d))
 			{
-			    await using var dataAccessor = new CurrenciesDataAccessor(new CentroBankExchangeRatesLoader());
-			    await dataAccessor.UpdateCurrencyRates(iter);
-			    Console.WriteLine($"{iter:dd.MM.yyyy} parsed");
+				await using var dataAccessor = new CurrenciesDataAccessor(new CentroBankExchangeRatesLoader());
+				await dataAccessor.UpdateCurrencyRates(iter);
+				Console.WriteLine($"{iter:dd.MM.yyyy} parsed");
 			}
 
 			Console.WriteLine("Done");

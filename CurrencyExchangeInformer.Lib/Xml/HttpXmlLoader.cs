@@ -8,9 +8,9 @@ namespace CurrencyExchangeInformer.Lib.Xml
 {
 	public class HttpXmlLoader
 	{
-		private readonly string _url;
-		private readonly HttpClient _httpClient;
 		private readonly Encoding _encoding;
+		private readonly HttpClient _httpClient;
+		private readonly string _url;
 
 		public HttpXmlLoader(string url)
 		{
@@ -27,6 +27,9 @@ namespace CurrencyExchangeInformer.Lib.Xml
 			return _encoding.GetString(bytes, 0, bytes.Length);
 		}
 
-		public async Task<XDocument> LoadXmlDocumentAsync() => XDocument.Parse(await LoadStringAsync());
+		public async Task<XDocument> LoadXmlDocumentAsync()
+		{
+			return XDocument.Parse(await LoadStringAsync());
+		}
 	}
 }

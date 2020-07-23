@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,17 +9,30 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 {
 	public class CurrenciesDataAccessor : IDisposable, IAsyncDisposable
 	{
-		private ExchangeCurrencyDbContext DbContext { get; }
-
-		private IExchangeRatesLoader Loader { get; }
-
 		public CurrenciesDataAccessor(IExchangeRatesLoader loader)
 		{
 			DbContext = new ExchangeCurrencyDbContext();
 			Loader = loader;
 		}
 
-		public async Task UpdateDbDataFromSource() => await UpdateDbDataFromSource(DateTime.Today.Date);
+		private ExchangeCurrencyDbContext DbContext { get; }
+
+		private IExchangeRatesLoader Loader { get; }
+
+		public ValueTask DisposeAsync()
+		{
+			return DbContext.DisposeAsync();
+		}
+
+		public void Dispose()
+		{
+			DbContext.Dispose();
+		}
+
+		public async Task UpdateDbDataFromSource()
+		{
+			await UpdateDbDataFromSource(DateTime.Today.Date);
+		}
 
 		public async Task UpdateDbDataFromSource(DateTime date)
 		{
@@ -28,7 +40,10 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			await UpdateCurrencyRates(date);
 		}
 
-		public async Task UpdateCurrencies() => await UpdateCurrencies(await Loader.GetCurrenciesAsync());
+		public async Task UpdateCurrencies()
+		{
+			await UpdateCurrencies(await Loader.GetCurrenciesAsync());
+		}
 
 		public async Task UpdateCurrencies(IEnumerable<Currencies> currencies)
 		{
@@ -54,11 +69,15 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			await DbContext.SaveChangesAsync();
 		}
 
-		public async Task UpdateCurrencyRates() =>
+		public async Task UpdateCurrencyRates()
+		{
 			await UpdateCurrencyRates(DateTime.Today);
+		}
 
-		public async Task UpdateCurrencyRates(DateTime date) =>
+		public async Task UpdateCurrencyRates(DateTime date)
+		{
 			await UpdateCurrencyRates(await Loader.GetCurrencyRatesForDateAsync(date), date);
+		}
 
 		public async Task UpdateCurrencyRates(IEnumerable<CurrencyRates> currencyRates,
 			DateTime date)
@@ -72,10 +91,7 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 				if (findCurrencyRate is null)
 					await DbContext.AddAsync(currencyRate);
 				else
-				{
 					findCurrencyRate.Value = currencyRate.Value;
-				}
-				await DbContext.SaveChangesAsync();
 			}
 
 			await DbContext.SaveChangesAsync();
@@ -95,18 +111,12 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			   .AnyAsync(cc =>
 					cc.Date.Equals(date) &&
 					(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName))) is false)
-			{
 				await UpdateCurrencyRates(date);
-			}
 
 			return (await DbContext.CurrencyRates
 			   .FirstOrDefaultAsync(cc =>
 					cc.Date.Equals(date) &&
 					(cc.Item.OriginalName.Contains(valuteName) || cc.Item.EngName.Contains(valuteName)))).Value;
 		}
-
-		public void Dispose() => DbContext.Dispose();
-
-		public ValueTask DisposeAsync() => DbContext.DisposeAsync();
 	}
 }

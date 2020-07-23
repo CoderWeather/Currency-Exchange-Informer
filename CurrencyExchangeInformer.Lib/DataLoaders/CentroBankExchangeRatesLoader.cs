@@ -8,16 +8,14 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 {
 	public class CentroBankExchangeRatesLoader : IExchangeRatesLoader
 	{
-		private string CurrenciesListUrl { get; }
-		private string ExchangesRateForDate { get; }
-
 		public CentroBankExchangeRatesLoader()
 		{
 			CurrenciesListUrl = @"http://www.cbr.ru/scripts/XML_valFull.asp";
 			ExchangesRateForDate = @"http://www.cbr.ru/scripts/XML_daily.asp?date_req=";
 		}
 
-		private string GetRateUrlForDate(DateTime date) => ExchangesRateForDate + date.ToString("dd.MM.yyyy");
+		private string CurrenciesListUrl { get; }
+		private string ExchangesRateForDate { get; }
 
 		public async Task<IEnumerable<Currencies>> GetCurrenciesAsync()
 		{
@@ -31,6 +29,11 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 			var httpClient = new HttpXmlLoader(GetRateUrlForDate(date));
 			var parser = new CurrencyRatesXmlParser(await httpClient.LoadStringAsync());
 			return CurrenciesDbModelsFabric.CreateCurrenciesRates(parser.GetCurrenciesRates(), date);
+		}
+
+		private string GetRateUrlForDate(DateTime date)
+		{
+			return ExchangesRateForDate + date.ToString("dd.MM.yyyy");
 		}
 	}
 }

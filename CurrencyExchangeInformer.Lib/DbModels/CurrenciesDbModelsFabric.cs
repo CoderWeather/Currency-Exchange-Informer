@@ -45,8 +45,10 @@ namespace CurrencyExchangeInformer.Lib.DbModels
 			return obj;
 		}
 
-		public static IEnumerable<Currencies> CreateCurrencies(IEnumerable<XElement> elements) =>
-			elements.Select(CreateCurrency);
+		public static IEnumerable<Currencies> CreateCurrencies(IEnumerable<XElement> elements)
+		{
+			return elements.Select(CreateCurrency);
+		}
 
 		public static CurrencyRates CreateCurrenciesConversion(XElement el, DateTime date)
 		{
@@ -69,7 +71,9 @@ namespace CurrencyExchangeInformer.Lib.DbModels
 		}
 
 		public static IEnumerable<CurrencyRates> CreateCurrenciesRates(IEnumerable<XElement> elements,
-			DateTime date) =>
-			elements.Select(el => CreateCurrenciesConversion(el, date));
+			DateTime date)
+		{
+			return elements.Select(el => CreateCurrenciesConversion(el, date));
+		}
 	}
 }

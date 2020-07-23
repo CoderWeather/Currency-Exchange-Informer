@@ -9,8 +9,10 @@ namespace CurrencyExchangeInformer.Lib.DataLoaders
 	{
 		public Task<IEnumerable<Currencies>> GetCurrenciesAsync();
 
-		public async Task<IEnumerable<CurrencyRates>> GetCurrencyRatesAsync() =>
-			await GetCurrencyRatesForDateAsync(DateTime.Today);
+		public async Task<IEnumerable<CurrencyRates>> GetCurrencyRatesAsync()
+		{
+			return await GetCurrencyRatesForDateAsync(DateTime.Today);
+		}
 
 		public Task<IEnumerable<CurrencyRates>> GetCurrencyRatesForDateAsync(DateTime date);
 	}
